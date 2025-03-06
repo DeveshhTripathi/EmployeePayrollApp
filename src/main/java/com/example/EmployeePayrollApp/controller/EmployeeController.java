@@ -11,8 +11,14 @@ import java.util.List;
 @RequestMapping("/employees")
 public class EmployeeController {
 
-    @Autowired
+
     private EmployeeService employeeService;
+
+    //This is the another way of autowire
+    @Autowired
+    public EmployeeController(EmployeeService employeeService) {
+        this.employeeService = employeeService;
+    }
 
     @GetMapping
     public List<EmployeeDTO> getAllEmployees() {
