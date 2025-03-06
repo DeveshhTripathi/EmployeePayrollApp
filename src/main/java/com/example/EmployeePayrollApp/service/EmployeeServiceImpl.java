@@ -21,7 +21,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     public EmployeeServiceImpl(EmployeeRepository employeeRepository) {
         this.employeeRepository = employeeRepository;
     }
-
+    //We can also use arrayList here for temporary insertion of data.
     @Override
     public List<EmployeeDTO> getAllEmployees() {
         return employeeRepository.findAll()
