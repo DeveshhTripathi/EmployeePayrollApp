@@ -1,8 +1,12 @@
 package com.example.EmployeePayrollApp.dto;
 
-import lombok.*;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
 
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class EmployeeDTO {
