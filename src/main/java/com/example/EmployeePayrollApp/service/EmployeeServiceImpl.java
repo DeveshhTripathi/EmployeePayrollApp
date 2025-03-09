@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 @Slf4j
 public class EmployeeServiceImpl implements EmployeeService {
 
-    private EmployeeRepository employeeRepository;
+    private final EmployeeRepository employeeRepository;
 
     @Autowired
     public EmployeeServiceImpl(EmployeeRepository employeeRepository) {
@@ -24,56 +24,81 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @Override
     public List<EmployeeDTO> getAllEmployees() {
-        log.info("Fetching all employees from database");
-        return employeeRepository.findAll()
-                .stream()
-                .map(this::convertToDTO)
-                .collect(Collectors.toList());
+        try {
+            log.info("Fetching all employees from the database");
+            return employeeRepository.findAll()
+                    .stream()
+                    .map(this::convertToDTO)
+                    .collect(Collectors.toList());
+        } catch (Exception e) {
+            log.error("Error fetching employees: {}", e.getMessage());
+            throw new RuntimeException("Failed to fetch employees", e);
+        }
     }
 
     @Override
     public EmployeeDTO getEmployeeById(Long id) {
-        log.info("Fetching employee with ID: {}", id);
-        Employee employee = employeeRepository.findById(id)
-                .orElseThrow(() -> {
-                    log.error("Employee not found with ID: {}", id);
-                    return new ResourceNotFoundException("Employee not found with ID: " + id);
-                });
-        return convertToDTO(employee);
+        try {
+            log.info("Fetching employee with ID: {}", id);
+            Employee employee = employeeRepository.findById(id)
+                    .orElseThrow(() -> {
+                        log.error("Employee not found with ID: {}", id);
+                        return new ResourceNotFoundException("Employee not found with ID: " + id);
+                    });
+            return convertToDTO(employee);
+        } catch (Exception e) {
+            log.error("Error fetching employee: {}", e.getMessage());
+            throw e;  // Let the controller handle this
+        }
     }
 
     @Override
     public EmployeeDTO saveEmployee(EmployeeDTO employeeDTO) {
-        log.info("Saving new employee: {}", employeeDTO);
-        Employee employee = convertToEntity(employeeDTO);
-        return convertToDTO(employeeRepository.save(employee));
+        try {
+            log.info("Saving new employee: {}", employeeDTO);
+            Employee employee = convertToEntity(employeeDTO);
+            return convertToDTO(employeeRepository.save(employee));
+        } catch (Exception e) {
+            log.error("Error saving employee: {}", e.getMessage());
+            throw new RuntimeException("Failed to save employee", e);
+        }
     }
 
     @Override
     public EmployeeDTO updateEmployee(Long id, EmployeeDTO employeeDTO) {
-        log.info("Updating employee with ID: {}", id);
-        Employee employee = employeeRepository.findById(id)
-                .orElseThrow(() -> {
-                    log.error("Employee not found with ID: {}", id);
-                    return new ResourceNotFoundException("Employee not found with ID: " + id);
-                });
+        try {
+            log.info("Updating employee with ID: {}", id);
+            Employee employee = employeeRepository.findById(id)
+                    .orElseThrow(() -> {
+                        log.error("Employee not found with ID: {}", id);
+                        return new ResourceNotFoundException("Employee not found with ID: " + id);
+                    });
 
-        employee.setName(employeeDTO.getName());
-        employee.setDepartment(employeeDTO.getDepartment());
-        employee.setSalary(employeeDTO.getSalary());
+            employee.setName(employeeDTO.getName());
+            employee.setDepartment(employeeDTO.getDepartment());
+            employee.setSalary(employeeDTO.getSalary());
 
-        return convertToDTO(employeeRepository.save(employee));
+            return convertToDTO(employeeRepository.save(employee));
+        } catch (Exception e) {
+            log.error("Error updating employee: {}", e.getMessage());
+            throw new RuntimeException("Failed to update employee", e);
+        }
     }
 
     @Override
     public void deleteEmployee(Long id) {
-        log.info("Deleting employee with ID: {}", id);
-        Employee employee = employeeRepository.findById(id)
-                .orElseThrow(() -> {
-                    log.error("Employee not found with ID: {}", id);
-                    return new ResourceNotFoundException("Employee not found with ID: " + id);
-                });
-        employeeRepository.delete(employee);
+        try {
+            log.info("Deleting employee with ID: {}", id);
+            Employee employee = employeeRepository.findById(id)
+                    .orElseThrow(() -> {
+                        log.error("Employee not found with ID: {}", id);
+                        return new ResourceNotFoundException("Employee not found with ID: " + id);
+                    });
+            employeeRepository.delete(employee);
+        } catch (Exception e) {
+            log.error("Error deleting employee: {}", e.getMessage());
+            throw new RuntimeException("Failed to delete employee", e);
+        }
     }
 
     private EmployeeDTO convertToDTO(Employee employee) {
@@ -84,3 +109,4 @@ public class EmployeeServiceImpl implements EmployeeService {
         return new Employee(null, employeeDTO.getName(), employeeDTO.getDepartment(), employeeDTO.getSalary());
     }
 }
+
